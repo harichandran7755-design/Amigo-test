@@ -1,0 +1,2984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMIGO - Emergency Coordination System</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#080d0b;
+    color:#e7ece9;
+    overflow-x:hidden;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+    width:245px;
+    background:#0b100e;
+    border-right:1px solid #202824;
+    padding:20px 14px;
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+}
+
+/* ================= CATCHY AMIGO LOGO ================= */
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:8px 9px;
+    margin-bottom:27px;
+}
+
+.logoMark{
+    width:46px;
+    height:46px;
+    border-radius:14px;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        linear-gradient(145deg,#183f2b,#10261b);
+    border:1px solid #3c8f61;
+    box-shadow:
+        0 0 18px rgba(53,151,91,.18),
+        inset 0 0 15px rgba(52,145,88,.08);
+    overflow:hidden;
+}
+
+.logoMark::before{
+    content:"";
+    position:absolute;
+    inset:4px;
+    border-radius:11px;
+    border:1px solid rgba(92,190,128,.25);
+}
+
+.logoMark svg{
+    width:30px;
+    height:30px;
+    position:relative;
+    z-index:2;
+}
+
+.logoTextWrap{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.logoText{
+    font-size:23px;
+    font-weight:800;
+    letter-spacing:2px;
+    line-height:1;
+    color:#f0f6f2;
+}
+
+.logoText span{
+    color:#49b977;
+}
+
+.logoSub{
+    font-size:8px;
+    color:#6f8177;
+    letter-spacing:1.5px;
+    margin-top:6px;
+    text-transform:uppercase;
+}
+
+.menu{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.menu button{
+    width:100%;
+    border:0;
+    background:transparent;
+    color:#8a948e;
+    padding:13px 14px;
+    text-align:left;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:14px;
+    transition:.2s;
+}
+
+.menu button:hover,
+.menu button.active{
+    background:#151d19;
+    color:#c9d8cf;
+}
+
+.statusBox{
+    position:absolute;
+    left:14px;
+    right:14px;
+    bottom:20px;
+    background:#111714;
+    border:1px solid #252e29;
+    border-radius:12px;
+    padding:14px;
+}
+
+.statusTitle{
+    font-size:11px;
+    color:#707b75;
+    margin-bottom:8px;
+}
+
+.online{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:13px;
+    color:#65c98b;
+}
+
+.onlineDot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#35c875;
+    box-shadow:0 0 8px rgba(53,200,117,.45);
+}
+
+/* ================= MAIN ================= */
+
+.main{
+    margin-left:245px;
+    width:calc(100% - 245px);
+}
+
+.topbar{
+    height:72px;
+    background:#0a0f0d;
+    border-bottom:1px solid #202823;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 28px;
+}
+
+.pageTitle{
+    font-size:22px;
+    font-weight:bold;
+    color:#e7ece9;
+}
+
+.pageSub{
+    font-size:12px;
+    color:#727d77;
+    margin-top:4px;
+}
+
+.clock{
+    color:#76b58f;
+    font-size:13px;
+}
+
+.content{
+    padding:24px;
+}
+
+.view{
+    display:none;
+}
+
+.view.active{
+    display:block;
+}
+
+/* ================= CARDS ================= */
+
+.card{
+    background:#0d1310;
+    border:1px solid #202923;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.cardTitle{
+    font-size:16px;
+    font-weight:bold;
+    margin-bottom:17px;
+    color:#e1e8e4;
+}
+
+/* ================= PATIENT ================= */
+
+.patientDetailsBlock{
+    border-left:3px solid #3d8f60;
+}
+
+.patientFields{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+}
+
+.field label{
+    display:block;
+    font-size:11px;
+    color:#747f79;
+    margin-bottom:7px;
+}
+
+.field input,
+.field select{
+    width:100%;
+    padding:11px 12px;
+    background:#090e0c;
+    color:#dfe6e2;
+    border:1px solid #252e29;
+    border-radius:8px;
+    outline:none;
+}
+
+.field input:focus,
+.field select:focus{
+    border-color:#4b8d65;
+}
+
+/* ================= MEDICAL ================= */
+
+.medicalGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+}
+
+.medicalSelect{
+    width:100%;
+    padding:11px;
+    background:#090e0c;
+    color:#dfe6e2;
+    border:1px solid #252e29;
+    border-radius:8px;
+    outline:none;
+}
+
+/* ================= BUTTONS ================= */
+
+.analyzeBtn,
+.callBtn{
+    width:100%;
+    margin-top:18px;
+    padding:14px;
+    border-radius:9px;
+    border:1px solid #3f9a63;
+    background:#237344;
+    color:#f1fff6;
+    font-weight:bold;
+    cursor:pointer;
+    font-size:14px;
+    transition:.2s;
+}
+
+.analyzeBtn:hover,
+.callBtn:hover{
+    background:#2b8250;
+    box-shadow:0 0 14px rgba(50,145,87,.18);
+}
+
+.callBtn.secondary{
+    background:#151e19;
+    border-color:#34443b;
+    color:#b9c9c0;
+}
+
+.callBtn.secondary:hover{
+    background:#1c2721;
+}
+
+/* ================= AI RESULT ================= */
+
+.aiResult{
+    display:none;
+}
+
+.severityBox{
+    padding:17px;
+    border-radius:11px;
+    margin-bottom:17px;
+    border:1px solid;
+}
+
+.severityBox h2{
+    font-size:20px;
+    margin-bottom:5px;
+}
+
+.criticalDanger{
+    background:#241313;
+    border-color:#a63d3d;
+    color:#ed7777;
+}
+
+.urgentWarning{
+    background:#241d0e;
+    border-color:#a47c32;
+    color:#d7ad58;
+}
+
+.stableSafe{
+    background:#102018;
+    border-color:#397454;
+    color:#72b88d;
+}
+
+/* ================= REQUIRED RESOURCES ================= */
+
+.needsGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+.need{
+    padding:13px;
+    border-radius:9px;
+    text-align:center;
+}
+
+.need strong{
+    display:block;
+    margin-top:6px;
+}
+
+.need.required{
+    background:#211111;
+    border:1px solid #8e3838;
+    color:#e5b1b1;
+}
+
+.need.required strong{
+    color:#ff6868;
+}
+
+.need.notRequired{
+    background:#101713;
+    border:1px solid #29352e;
+    color:#aebbb4;
+}
+
+.need.notRequired strong{
+    color:#70b58a;
+}
+
+/* ================= HOSPITAL ================= */
+
+.hospitalMain{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.recommendedHospital,
+.backupHospital{
+    background:#101613;
+    border-radius:14px;
+    padding:20px;
+}
+
+.recommendedHospital{
+    border:1px solid #4a9465;
+    box-shadow:0 0 18px rgba(55,135,83,.07);
+}
+
+.backupHospital{
+    border:1px solid #303b34;
+}
+
+.hospitalBadge{
+    display:inline-block;
+    padding:6px 9px;
+    border-radius:6px;
+    background:#18251d;
+    color:#79b990;
+    font-size:10px;
+    font-weight:bold;
+    margin-bottom:12px;
+}
+
+.backupBadge{
+    background:#171d19;
+    color:#9aa9a1;
+}
+
+.hospitalName{
+    font-size:21px;
+    font-weight:bold;
+    margin-bottom:6px;
+    color:#e3e9e6;
+}
+
+.hospitalLocation{
+    color:#75817a;
+    font-size:12px;
+    margin-bottom:18px;
+}
+
+.hospitalStats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+    margin-bottom:17px;
+}
+
+.stat{
+    background:#090e0c;
+    border:1px solid #242d28;
+    padding:10px;
+    border-radius:8px;
+}
+
+.statLabel{
+    color:#6d7772;
+    font-size:9px;
+    margin-bottom:4px;
+}
+
+.statValue{
+    color:#d9e3de;
+    font-weight:bold;
+    font-size:13px;
+}
+
+.resources{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.resource{
+    padding:8px;
+    border-radius:6px;
+    background:#151e19;
+    color:#8ab89b;
+    font-size:10px;
+    text-align:center;
+}
+
+.resource.no{
+    background:#211414;
+    color:#c96d6d;
+}
+
+.hospitalCallBtn{
+    margin-top:16px;
+}
+
+/* ================= CALL PANEL ================= */
+
+.hospitalCoordination{
+    margin-top:20px;
+}
+
+.callHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+}
+
+.callStatus{
+    padding:7px 11px;
+    border-radius:7px;
+    background:#17231c;
+    color:#79b990;
+    font-size:11px;
+    border:1px solid #304b39;
+}
+
+.callPanel{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.callInfo{
+    background:#090f0c;
+    border:1px solid #242d28;
+    border-radius:12px;
+    padding:17px;
+}
+
+.callInfoTitle{
+    font-size:13px;
+    color:#78847d;
+    margin-bottom:13px;
+}
+
+.callRow{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid #1a211d;
+    font-size:12px;
+}
+
+.callRow:last-child{
+    border-bottom:0;
+}
+
+.callRow span:first-child{
+    color:#707b75;
+}
+
+.callRow span:last-child{
+    color:#d9e3de;
+    font-weight:bold;
+}
+
+/* ================= TABLE ================= */
+
+.table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.table th,
+.table td{
+    padding:12px;
+    border-bottom:1px solid #1d2721;
+    text-align:left;
+    font-size:12px;
+}
+
+.table th{
+    color:#737f78;
+}
+
+.table td{
+    color:#d2dcd7;
+}
+
+.selected{
+    color:#70b58a!important;
+    font-weight:bold;
+}
+
+.backupText{
+    color:#a7b2ac!important;
+}
+
+/* ================= MAP ================= */
+
+.mapCard{
+    height:420px;
+    position:relative;
+    overflow:hidden;
+}
+
+.map{
+    width:100%;
+    height:100%;
+    border-radius:12px;
+
+    background:
+    linear-gradient(
+        30deg,
+        transparent 48%,
+        #202b25 49%,
+        #202b25 51%,
+        transparent 52%
+    ),
+    linear-gradient(
+        120deg,
+        transparent 48%,
+        #202b25 49%,
+        #202b25 51%,
+        transparent 52%
+    ),
+    #090f0c;
+
+    position:relative;
+}
+
+.road{
+    position:absolute;
+    background:#334139;
+    opacity:.55;
+}
+
+.road1{
+    width:120%;
+    height:8px;
+    top:48%;
+    left:-10%;
+    transform:rotate(-8deg);
+}
+
+.road2{
+    width:100%;
+    height:7px;
+    top:60%;
+    left:0;
+    transform:rotate(22deg);
+}
+
+.road3{
+    width:100%;
+    height:6px;
+    top:30%;
+    transform:rotate(-28deg);
+}
+
+.mapPin{
+    position:absolute;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:10px;
+}
+
+.ambulancePin{
+    left:35%;
+    top:58%;
+    background:#4aa874;
+    box-shadow:0 0 13px rgba(74,168,116,.35);
+}
+
+.hospitalPin{
+    left:68%;
+    top:35%;
+    background:#4788a9;
+    box-shadow:0 0 13px rgba(71,136,169,.3);
+}
+
+.mapLabel{
+    position:absolute;
+    background:#090e0c;
+    border:1px solid #303a34;
+    padding:7px 9px;
+    border-radius:7px;
+    font-size:10px;
+    color:#cbd5d0;
+}
+
+.ambulanceLabel{
+    left:28%;
+    top:64%;
+}
+
+.hospitalLabel{
+    left:61%;
+    top:27%;
+}
+
+/* ================= RESOURCE ================= */
+
+.progress{
+    height:7px;
+    border-radius:5px;
+    background:#17201b;
+    overflow:hidden;
+}
+
+.progressFill{
+    height:100%;
+    background:#438f60;
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.78);
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+}
+
+.modalBox{
+    width:440px;
+    background:#0d1310;
+    border:1px solid #35463c;
+    border-radius:15px;
+    padding:25px;
+    box-shadow:0 20px 70px rgba(0,0,0,.6);
+}
+
+.modalTitle{
+    font-size:20px;
+    margin-bottom:8px;
+}
+
+.modalText{
+    color:#7f8b84;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.closeBtn{
+    width:100%;
+    margin-top:18px;
+    padding:11px;
+    background:#151d19;
+    border:1px solid #334139;
+    color:#b7c5bd;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1100px){
+
+    .patientFields,
+    .medicalGrid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .hospitalMain,
+    .callPanel{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:750px){
+
+    .sidebar{
+        width:75px;
+    }
+
+    .logoTextWrap,
+    .statusBox{
+        display:none;
+    }
+
+    .logo{
+        justify-content:center;
+    }
+
+    .main{
+        margin-left:75px;
+        width:calc(100% - 75px);
+    }
+
+    .patientFields,
+    .medicalGrid,
+    .needsGrid{
+        grid-template-columns:1fr;
+    }
+
+    .content{
+        padding:14px;
+    }
+
+    .hospitalStats,
+    .resources{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+<div class="logo">
+
+<!-- AMIGO CATCHY MEDICAL-TECH LOGO -->
+
+<div class="logoMark">
+
+<svg viewBox="0 0 64 64" fill="none">
+
+<!-- Shield -->
+
+<path
+d="M32 5
+L52 13
+V29
+C52 43 43 53 32 59
+C21 53 12 43 12 29
+V13
+L32 5Z"
+stroke="#54C984"
+stroke-width="3"
+stroke-linejoin="round"/>
+
+<!-- Medical Cross -->
+
+<path
+d="M28 18H36V27H45V35H36V44H28V35H19V27H28V18Z"
+fill="#EAF8F0"/>
+
+<!-- Pulse -->
+
+<path
+d="M16 39
+H22
+L26 34
+L30 42
+L35 29
+L39 39
+H48"
+stroke="#54C984"
+stroke-width="2.5"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+</svg>
+
+</div>
+
+<div class="logoTextWrap">
+
+<div class="logoText">
+AM<span>I</span>GO
+</div>
+
+<div class="logoSub">
+Emergency Coordination
+</div>
+
+</div>
+
+</div>
+
+
+<div class="menu">
+
+<button class="active" onclick="showView('dashboard',this)">
+🏠 <span>Dashboard</span>
+</button>
+
+<button onclick="showView('analysis',this)">
+🧠 <span>Patient Analysis</span>
+</button>
+
+<button onclick="showView('mapView',this)">
+📍 <span>Live GPS Map</span>
+</button>
+
+<button onclick="showView('ambulances',this)">
+🚑 <span>Ambulances</span>
+</button>
+
+<button onclick="showView('hospitals',this)">
+🏥 <span>Hospital Network</span>
+</button>
+
+<button onclick="showView('resources',this)">
+🩺 <span>Resource Status</span>
+</button>
+
+<button onclick="showView('reservations',this)">
+🔒 <span>Reservations</span>
+</button>
+
+</div>
+
+
+<div class="statusBox">
+
+<div class="statusTitle">
+SYSTEM STATUS
+</div>
+
+<div class="online">
+<div class="onlineDot"></div>
+AMIGO ONLINE
+</div>
+
+</div>
+
+</aside>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main">
+
+<header class="topbar">
+
+<div>
+
+<div class="pageTitle">
+Emergency Coordination Dashboard
+</div>
+
+<div class="pageSub">
+AI-assisted ambulance → hospital coordination
+</div>
+
+</div>
+
+<div class="clock" id="clock"></div>
+
+</header>
+
+
+<div class="content">
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboard" class="view active">
+
+
+<!-- PATIENT DETAILS -->
+
+<div class="card patientDetailsBlock">
+
+<div class="cardTitle">
+👤 Patient Details
+</div>
+
+<div class="patientFields">
+
+<div class="field">
+
+<label>PATIENT NAME</label>
+
+<input
+type="text"
+id="patientName"
+placeholder="Enter patient name">
+
+</div>
+
+
+<div class="field">
+
+<label>AGE</label>
+
+<input
+type="number"
+id="age"
+placeholder="Enter age"
+min="0"
+max="120">
+
+</div>
+
+
+<div class="field">
+
+<label>GENDER</label>
+
+<select id="gender">
+
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>BLOOD GROUP</label>
+
+<select id="blood">
+
+<option>O+</option>
+<option>O-</option>
+<option>A+</option>
+<option>A-</option>
+<option>B+</option>
+<option>B-</option>
+<option>AB+</option>
+<option>AB-</option>
+<option>Unknown</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>EMERGENCY TYPE</label>
+
+<select id="emergency">
+
+<option>Cardiac Emergency</option>
+<option>Trauma</option>
+<option>Respiratory Emergency</option>
+<option>Neurological Emergency</option>
+<option>General Emergency</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>AMBULANCE ID</label>
+
+<input
+type="text"
+id="ambulance"
+value="AMB-204">
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MEDICAL DETAILS -->
+
+<div class="card medicalBlock">
+
+<div class="cardTitle">
+🩺 Patient Medical Details
+</div>
+
+<div class="medicalGrid">
+
+
+<div class="field">
+
+<label>BLOOD PRESSURE (SYSTOLIC)</label>
+
+<select id="bp" class="medicalSelect">
+
+<option value="120">
+120 mmHg - Normal
+</option>
+
+<option value="100">
+100 mmHg
+</option>
+
+<option value="90">
+90 mmHg
+</option>
+
+<option value="80">
+80 mmHg - Low
+</option>
+
+<option value="70">
+70 mmHg - Critical
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>HEART RATE</label>
+
+<select id="heart" class="medicalSelect">
+
+<option value="75">
+75 BPM - Normal
+</option>
+
+<option value="90">
+90 BPM
+</option>
+
+<option value="110">
+110 BPM
+</option>
+
+<option value="125">
+125 BPM - High
+</option>
+
+<option value="145">
+145 BPM - Critical
+</option>
+
+<option value="45">
+45 BPM - Low
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>SPO₂</label>
+
+<select id="spo2" class="medicalSelect">
+
+<option value="98">
+98% - Normal
+</option>
+
+<option value="95">
+95%
+</option>
+
+<option value="93">
+93% - Low
+</option>
+
+<option value="89">
+89% - Critical
+</option>
+
+<option value="82">
+82% - Severe
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>TEMPERATURE</label>
+
+<select id="temp" class="medicalSelect">
+
+<option value="37">
+37°C - Normal
+</option>
+
+<option value="38">
+38°C
+</option>
+
+<option value="39">
+39°C - High
+</option>
+
+<option value="40">
+40°C - Critical
+</option>
+
+<option value="34">
+34°C - Low
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>RESPIRATORY RATE</label>
+
+<select id="resp" class="medicalSelect">
+
+<option value="16">
+16 /min - Normal
+</option>
+
+<option value="20">
+20 /min
+</option>
+
+<option value="25">
+25 /min - High
+</option>
+
+<option value="30">
+30 /min - Critical
+</option>
+
+<option value="8">
+8 /min - Low
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>CONSCIOUSNESS</label>
+
+<select id="conscious" class="medicalSelect">
+
+<option>Alert</option>
+<option>Confused</option>
+<option>Unconscious</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>TRAUMA</label>
+
+<select id="trauma" class="medicalSelect">
+
+<option>No</option>
+<option>Yes</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>PAIN LEVEL</label>
+
+<select id="pain" class="medicalSelect">
+
+<option value="2">
+2 / 10 - Mild
+</option>
+
+<option value="5">
+5 / 10 - Moderate
+</option>
+
+<option value="7">
+7 / 10 - High
+</option>
+
+<option value="9">
+9 / 10 - Severe
+</option>
+
+<option value="10">
+10 / 10 - Severe
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>BLOOD GLUCOSE</label>
+
+<select id="glucose" class="medicalSelect">
+
+<option value="100">
+100 mg/dL - Normal
+</option>
+
+<option value="70">
+70 mg/dL
+</option>
+
+<option value="55">
+55 mg/dL - Low
+</option>
+
+<option value="250">
+250 mg/dL - High
+</option>
+
+<option value="350">
+350 mg/dL - Critical
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<button
+class="analyzeBtn"
+onclick="analyzePatient()">
+
+🧠 ANALYZE PATIENT & FIND BEST HOSPITAL
+
+</button>
+
+</div>
+
+
+<!-- AI RESULT -->
+
+<div
+class="card aiResult"
+id="aiResult">
+
+<div class="cardTitle">
+🤖 AMIGO AI Patient Analysis
+</div>
+
+<div
+id="severityBox"
+class="severityBox">
+</div>
+
+<div
+class="needsGrid"
+id="needsGrid">
+</div>
+
+</div>
+
+
+<!-- ================= HOSPITAL COORDINATION ================= -->
+
+<div class="card hospitalCoordination">
+
+<div class="callHeader">
+
+<div class="cardTitle" style="margin:0;">
+🏥 Hospital Coordination
+</div>
+
+<div
+class="callStatus"
+id="callStatus">
+
+READY
+
+</div>
+
+</div>
+
+
+<div class="hospitalMain">
+
+
+<!-- RECOMMENDED HOSPITAL -->
+
+<div
+class="recommendedHospital"
+id="recommendedCard">
+
+<div class="hospitalBadge">
+★ AMIGO RECOMMENDED
+</div>
+
+<div
+class="hospitalName"
+id="recommendedName">
+
+CityCare Emergency Hospital
+
+</div>
+
+<div
+class="hospitalLocation">
+
+Salem • Emergency Care Network
+
+</div>
+
+
+<div class="hospitalStats">
+
+<div class="stat">
+
+<div class="statLabel">
+ETA
+</div>
+
+<div
+class="statValue"
+id="recommendedEta">
+
+7 min
+
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="statLabel">
+DISTANCE
+</div>
+
+<div
+class="statValue"
+id="recommendedDistance">
+
+3.8 km
+
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="statLabel">
+CAPACITY
+</div>
+
+<div
+class="statValue"
+id="recommendedCapacity">
+
+78%
+
+</div>
+
+</div>
+
+</div>
+
+
+<div
+class="resources"
+id="recommendedResources">
+</div>
+
+
+<button
+class="callBtn hospitalCallBtn"
+onclick="callHospital()">
+
+📞 CALL RECOMMENDED HOSPITAL
+
+</button>
+
+</div>
+
+
+<!-- BACKUP HOSPITAL -->
+
+<div
+class="backupHospital"
+id="backupCard">
+
+<div class="hospitalBadge backupBadge">
+◈ BACKUP HOSPITAL
+</div>
+
+<div
+class="hospitalName"
+id="backupName">
+
+Metro Medical Center
+
+</div>
+
+<div class="hospitalLocation">
+
+Salem • Emergency Care Network
+
+</div>
+
+
+<div class="hospitalStats">
+
+<div class="stat">
+
+<div class="statLabel">
+ETA
+</div>
+
+<div
+class="statValue"
+id="backupEta">
+
+11 min
+
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="statLabel">
+DISTANCE
+</div>
+
+<div
+class="statValue"
+id="backupDistance">
+
+6.2 km
+
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="statLabel">
+CAPACITY
+</div>
+
+<div
+class="statValue"
+id="backupCapacity">
+
+62%
+
+</div>
+
+</div>
+
+</div>
+
+
+<div
+class="resources"
+id="backupResources">
+</div>
+
+
+<button
+class="callBtn secondary hospitalCallBtn"
+onclick="callBackupHospital()">
+
+📞 CALL BACKUP HOSPITAL
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- COMMUNICATION STATUS -->
+
+<div
+class="callPanel"
+style="margin-top:20px;">
+
+
+<div class="callInfo">
+
+<div class="callInfoTitle">
+📞 SELECTED HOSPITAL COMMUNICATION
+</div>
+
+
+<div class="callRow">
+
+<span>Hospital</span>
+
+<span id="callHospitalName">
+CityCare Emergency Hospital
+</span>
+
+</div>
+
+
+<div class="callRow">
+
+<span>Connection</span>
+
+<span id="connectionStatus">
+Ready to connect
+</span>
+
+</div>
+
+
+<div class="callRow">
+
+<span>Patient</span>
+
+<span id="callPatientName">
+Not analyzed
+</span>
+
+</div>
+
+
+<div class="callRow">
+
+<span>Reservation</span>
+
+<span id="reservationStatus">
+Pending
+</span>
+
+</div>
+
+</div>
+
+
+<div class="callInfo">
+
+<div class="callInfoTitle">
+📡 HOSPITAL RESPONSE
+</div>
+
+
+<div class="callRow">
+
+<span>Resource Status</span>
+
+<span id="resourceStatus">
+Available
+</span>
+
+</div>
+
+
+<div class="callRow">
+
+<span>ICU</span>
+
+<span id="callICU">
+Available
+</span>
+
+</div>
+
+
+<div class="callRow">
+
+<span>Emergency Team</span>
+
+<span>On Standby</span>
+
+</div>
+
+
+<div class="callRow">
+
+<span>AMIGO Status</span>
+
+<span id="amigoCallStatus">
+Ready
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- HOSPITAL TABLE -->
+
+<div class="card">
+
+<div class="cardTitle">
+🏥 Hospital Network
+</div>
+
+<table class="table">
+
+<thead>
+
+<tr>
+<th>Hospital</th>
+<th>ETA</th>
+<th>Distance</th>
+<th>ICU</th>
+<th>Oxygen</th>
+<th>Capacity</th>
+<th>Status</th>
+</tr>
+
+</thead>
+
+<tbody
+id="hospitalTableBody">
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+<!-- ================= ANALYSIS ================= -->
+
+<section
+id="analysis"
+class="view">
+
+<div class="card">
+
+<div class="cardTitle">
+🧠 Patient Analysis
+</div>
+
+<p style="
+color:#7d8882;
+font-size:13px;
+line-height:1.7;
+">
+
+AMIGO analyzes the entered patient information and identifies required emergency resources before matching the ambulance with an available hospital.
+
+</p>
+
+
+<div
+id="analysisSummary"
+style="
+margin-top:20px;
+color:#b9c6bf;
+font-size:13px;
+">
+
+No patient analysis completed yet.
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= MAP ================= -->
+
+<section
+id="mapView"
+class="view">
+
+<div class="card">
+
+<div class="cardTitle">
+📍 Live GPS Tracking
+</div>
+
+<div class="mapCard">
+
+<div class="map">
+
+<div class="road road1"></div>
+<div class="road road2"></div>
+<div class="road road3"></div>
+
+<div class="mapPin ambulancePin">
+🚑
+</div>
+
+<div class="mapLabel ambulanceLabel">
+Ambulance AMB-204
+</div>
+
+<div class="mapPin hospitalPin">
+🏥
+</div>
+
+<div class="mapLabel hospitalLabel">
+Recommended Hospital
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= AMBULANCES ================= -->
+
+<section
+id="ambulances"
+class="view">
+
+<div class="card">
+
+<div class="cardTitle">
+🚑 Active Ambulances
+</div>
+
+<table class="table">
+
+<thead>
+
+<tr>
+<th>Ambulance ID</th>
+<th>Status</th>
+<th>Patient</th>
+<th>Location</th>
+<th>Destination</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>AMB-204</td>
+
+<td class="selected">
+EN ROUTE
+</td>
+
+<td id="ambulancePatient">
+Pending
+</td>
+
+<td>
+Salem
+</td>
+
+<td id="ambulanceDestination">
+CityCare Emergency Hospital
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>AMB-118</td>
+
+<td>
+AVAILABLE
+</td>
+
+<td>-</td>
+
+<td>Salem</td>
+
+<td>-</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+<!-- ================= HOSPITAL NETWORK ================= -->
+
+<section
+id="hospitals"
+class="view">
+
+<div class="card">
+
+<div class="cardTitle">
+🏥 Hospital Network
+</div>
+
+<table class="table">
+
+<thead>
+
+<tr>
+<th>Hospital</th>
+<th>ICU</th>
+<th>Oxygen</th>
+<th>Ventilator</th>
+<th>CT</th>
+<th>Capacity</th>
+</tr>
+
+</thead>
+
+<tbody
+id="hospitalNetworkTable">
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+<!-- ================= RESOURCES ================= -->
+
+<section
+id="resources"
+class="view">
+
+<div class="card">
+
+<div class="cardTitle">
+🩺 Hospital Resource Status
+</div>
+
+<div id="resourceCards"></div>
+
+</div>
+
+</section>
+
+
+<!-- ================= RESERVATIONS ================= -->
+
+<section
+id="reservations"
+class="view">
+
+<div class="card">
+
+<div class="cardTitle">
+🔒 Active Reservations
+</div>
+
+<table class="table">
+
+<thead>
+
+<tr>
+<th>Reservation ID</th>
+<th>Hospital</th>
+<th>Resource</th>
+<th>Patient</th>
+<th>Status</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>
+RES-2048
+</td>
+
+<td id="reservationHospital">
+CityCare Emergency Hospital
+</td>
+
+<td>
+ICU
+</td>
+
+<td id="reservationPatient">
+Pending
+</td>
+
+<td class="selected">
+RESERVED
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+</div>
+
+</main>
+
+</div>
+
+
+<!-- ================= MODAL ================= -->
+
+<div
+class="modal"
+id="callModal">
+
+<div class="modalBox">
+
+<div class="modalTitle">
+📞 Hospital Communication
+</div>
+
+<div
+class="modalText"
+id="modalText">
+
+Connecting to hospital...
+
+</div>
+
+<button
+class="closeBtn"
+onclick="closeModal()">
+
+CLOSE
+
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ================= HOSPITAL DATABASE ================= */
+
+const hospitals=[
+
+{
+name:"CityCare Emergency Hospital",
+eta:7,
+distance:"3.8 km",
+icu:true,
+oxygen:true,
+specialist:true,
+trauma:true,
+ventilator:true,
+ct:true,
+cardiac:true,
+surgery:true,
+capacity:78
+},
+
+{
+name:"Metro Medical Center",
+eta:11,
+distance:"6.2 km",
+icu:true,
+oxygen:true,
+specialist:true,
+trauma:false,
+ventilator:true,
+ct:true,
+cardiac:true,
+surgery:false,
+capacity:62
+},
+
+{
+name:"Central Emergency Hospital",
+eta:5,
+distance:"2.4 km",
+icu:false,
+oxygen:true,
+specialist:true,
+trauma:true,
+ventilator:false,
+ct:true,
+cardiac:true,
+surgery:true,
+capacity:85
+},
+
+{
+name:"Salem Advanced Care",
+eta:13,
+distance:"8.1 km",
+icu:true,
+oxygen:true,
+specialist:true,
+trauma:true,
+ventilator:true,
+ct:true,
+cardiac:true,
+surgery:true,
+capacity:55
+}
+
+];
+
+
+let selectedHospital=hospitals[0];
+let backupHospital=hospitals[1];
+
+
+/* ================= NAVIGATION ================= */
+
+function showView(viewId,button){
+
+document
+.querySelectorAll(".view")
+.forEach(v=>v.classList.remove("active"));
+
+document
+.getElementById(viewId)
+.classList.add("active");
+
+document
+.querySelectorAll(".menu button")
+.forEach(b=>b.classList.remove("active"));
+
+button.classList.add("active");
+
+}
+
+
+/* ================= ANALYZE ================= */
+
+function analyzePatient(){
+
+const name=
+document.getElementById("patientName").value ||
+"Unknown Patient";
+
+const age=
+Number(document.getElementById("age").value)||0;
+
+const gender=
+document.getElementById("gender").value;
+
+const blood=
+document.getElementById("blood").value;
+
+const emergency=
+document.getElementById("emergency").value;
+
+const ambulance=
+document.getElementById("ambulance").value;
+
+const bp=
+Number(document.getElementById("bp").value);
+
+const heart=
+Number(document.getElementById("heart").value);
+
+const spo2=
+Number(document.getElementById("spo2").value);
+
+const temp=
+Number(document.getElementById("temp").value);
+
+const resp=
+Number(document.getElementById("resp").value);
+
+const conscious=
+document.getElementById("conscious").value;
+
+const trauma=
+document.getElementById("trauma").value;
+
+const pain=
+Number(document.getElementById("pain").value);
+
+const glucose=
+Number(document.getElementById("glucose").value);
+
+
+let score=0;
+
+if(heart>=120||heart<50)
+score+=20;
+
+if(bp<90)
+score+=25;
+
+if(spo2<90)
+score+=30;
+else if(spo2<94)
+score+=15;
+
+if(resp>=25||resp<10)
+score+=15;
+
+if(temp>=39||temp<35)
+score+=10;
+
+if(conscious==="Confused")
+score+=15;
+
+if(conscious==="Unconscious")
+score+=30;
+
+if(trauma==="Yes")
+score+=15;
+
+if(pain>=8)
+score+=10;
+
+if(glucose<60||glucose>300)
+score+=15;
+
+score=Math.min(score,100);
+
+
+let severity;
+
+if(score>=70)
+severity="CRITICAL";
+else if(score>=35)
+severity="URGENT";
+else
+severity="STABLE";
+
+
+let severityClass;
+
+if(severity==="CRITICAL")
+severityClass="criticalDanger";
+else if(severity==="URGENT")
+severityClass="urgentWarning";
+else
+severityClass="stableSafe";
+
+
+const severityBox=
+document.getElementById("severityBox");
+
+severityBox.className=
+"severityBox "+severityClass;
+
+severityBox.innerHTML=`
+
+<h2>${severity}</h2>
+
+<div>
+AMIGO Emergency Severity Score: ${score}/100
+</div>
+
+`;
+
+
+const needs={
+
+ICU:
+score>=70||
+conscious==="Unconscious",
+
+Oxygen:
+score>=70||
+spo2<94,
+
+Specialist:
+score>=70||
+trauma==="Yes"||
+conscious==="Unconscious",
+
+Trauma:
+trauma==="Yes",
+
+Ventilator:
+spo2<85||
+conscious==="Unconscious",
+
+CT:
+trauma==="Yes"||
+conscious!=="Alert",
+
+Cardiac:
+heart>=120||
+heart<50,
+
+Surgery:
+trauma==="Yes"&&
+score>=70
+
+};
+
+
+renderNeeds(needs);
+
+document
+.getElementById("aiResult")
+.style.display="block";
+
+
+const best=
+findBestHospital(needs);
+
+selectedHospital=
+best||hospitals[0];
+
+backupHospital=
+hospitals.find(
+h=>
+h!==selectedHospital &&
+hospitalMatches(h,needs)
+)
+||
+hospitals.find(
+h=>h!==selectedHospital
+);
+
+
+displayHospital(
+selectedHospital,
+backupHospital
+);
+
+renderHospitalTable(
+selectedHospital,
+backupHospital
+);
+
+
+document
+.getElementById("analysisSummary")
+.innerHTML=`
+
+<div style="
+background:#09100c;
+border:1px solid #252e29;
+border-radius:10px;
+padding:17px;
+line-height:2;
+">
+
+<b style="color:#79b990;">
+Patient Analysis Completed
+</b>
+
+<br>
+
+Patient:
+<strong>${name}</strong>
+
+<br>
+
+Age:
+<strong>${age}</strong>
+&nbsp; | &nbsp;
+
+Gender:
+<strong>${gender}</strong>
+
+<br>
+
+Blood Group:
+<strong>${blood}</strong>
+&nbsp; | &nbsp;
+
+Emergency:
+<strong>${emergency}</strong>
+
+<br>
+
+Ambulance:
+<strong>${ambulance}</strong>
+
+<br>
+
+Vitals:
+BP ${bp}
+/
+HR ${heart}
+/
+SpO₂ ${spo2}%
+/
+Temp ${temp}°C
+
+<br>
+
+Consciousness:
+<strong>${conscious}</strong>
+
+&nbsp; | &nbsp;
+
+Trauma:
+<strong>${trauma}</strong>
+
+<br>
+
+AMIGO Score:
+<strong>${score}/100</strong>
+
+&nbsp; | &nbsp;
+
+Severity:
+<strong>${severity}</strong>
+
+</div>
+
+`;
+
+
+document
+.getElementById("callPatientName")
+.innerText=name;
+
+document
+.getElementById("ambulancePatient")
+.innerText=name;
+
+document
+.getElementById("reservationPatient")
+.innerText=name;
+
+document
+.getElementById("reservationStatus")
+.innerText="RESERVED";
+
+document
+.getElementById("resourceStatus")
+.innerText="Reserved";
+
+document
+.getElementById("connectionStatus")
+.innerText="Ready to connect";
+
+document
+.getElementById("amigoCallStatus")
+.innerText="Ready";
+
+document
+.getElementById("callStatus")
+.innerText="READY";
+
+}
+
+
+/* ================= REQUIRED ================= */
+
+function renderNeeds(needs){
+
+const grid=
+document.getElementById("needsGrid");
+
+grid.innerHTML="";
+
+Object.entries(needs).forEach(
+([key,value])=>{
+
+grid.innerHTML+=`
+
+<div class="need ${value?"required":"notRequired"}">
+
+${key}
+
+<strong>
+${value?"REQUIRED":"NOT REQUIRED"}
+</strong>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+/* ================= MATCHING ================= */
+
+function hospitalMatches(h,needs){
+
+if(needs.ICU&&!h.icu)
+return false;
+
+if(needs.Oxygen&&!h.oxygen)
+return false;
+
+if(needs.Specialist&&!h.specialist)
+return false;
+
+if(needs.Trauma&&!h.trauma)
+return false;
+
+if(needs.Ventilator&&!h.ventilator)
+return false;
+
+if(needs.CT&&!h.ct)
+return false;
+
+if(needs.Cardiac&&!h.cardiac)
+return false;
+
+if(needs.Surgery&&!h.surgery)
+return false;
+
+return true;
+
+}
+
+
+function findBestHospital(needs){
+
+const eligible=
+hospitals.filter(
+h=>hospitalMatches(h,needs)
+);
+
+eligible.sort(
+(a,b)=>a.eta-b.eta
+);
+
+return eligible[0]||hospitals[0];
+
+}
+
+
+/* ================= DISPLAY HOSPITAL ================= */
+
+function displayHospital(selected,backup){
+
+selectedHospital=selected;
+backupHospital=backup;
+
+
+document
+.getElementById("recommendedName")
+.innerText=selected.name;
+
+document
+.getElementById("recommendedEta")
+.innerText=
+selected.eta+" min";
+
+document
+.getElementById("recommendedDistance")
+.innerText=
+selected.distance;
+
+document
+.getElementById("recommendedCapacity")
+.innerText=
+selected.capacity+"%";
+
+document
+.getElementById("recommendedResources")
+.innerHTML=
+createResources(selected);
+
+
+if(backup){
+
+document
+.getElementById("backupName")
+.innerText=
+backup.name;
+
+document
+.getElementById("backupEta")
+.innerText=
+backup.eta+" min";
+
+document
+.getElementById("backupDistance")
+.innerText=
+backup.distance;
+
+document
+.getElementById("backupCapacity")
+.innerText=
+backup.capacity+"%";
+
+document
+.getElementById("backupResources")
+.innerHTML=
+createResources(backup);
+
+}
+
+
+document
+.getElementById("callHospitalName")
+.innerText=
+selected.name;
+
+document
+.getElementById("reservationHospital")
+.innerText=
+selected.name;
+
+document
+.getElementById("ambulanceDestination")
+.innerText=
+selected.name;
+
+document
+.getElementById("callICU")
+.innerText=
+selected.icu?
+"Available":
+"Unavailable";
+
+}
+
+
+/* ================= RESOURCES ================= */
+
+function createResources(h){
+
+const resources=[
+
+["ICU",h.icu],
+["OXYGEN",h.oxygen],
+["SPECIALIST",h.specialist],
+["TRAUMA",h.trauma],
+["VENTILATOR",h.ventilator],
+["CT",h.ct],
+["CARDIAC",h.cardiac],
+["SURGERY",h.surgery]
+
+];
+
+return resources.map(
+r=>`
+
+<div class="resource ${r[1]?"":"no"}">
+
+${r[1]?"✓":"✕"} ${r[0]}
+
+</div>
+
+`
+).join("");
+
+}
+
+
+/* ================= TABLE ================= */
+
+function renderHospitalTable(selected,backup){
+
+const tbody=
+document.getElementById(
+"hospitalTableBody"
+);
+
+tbody.innerHTML="";
+
+hospitals.forEach(h=>{
+
+let status="AVAILABLE";
+let className="";
+
+if(h===selected){
+
+status="★ RECOMMENDED";
+className="selected";
+
+}
+
+else if(h===backup){
+
+status="◈ BACKUP";
+className="backupText";
+
+}
+
+
+tbody.innerHTML+=`
+
+<tr>
+
+<td>${h.name}</td>
+
+<td>${h.eta} min</td>
+
+<td>${h.distance}</td>
+
+<td>${h.icu?"YES":"NO"}</td>
+
+<td>${h.oxygen?"YES":"NO"}</td>
+
+<td>${h.capacity}%</td>
+
+<td class="${className}">
+${status}
+</td>
+
+</tr>
+
+`;
+
+});
+
+renderHospitalNetwork();
+
+}
+
+
+/* ================= NETWORK ================= */
+
+function renderHospitalNetwork(){
+
+const tbody=
+document.getElementById(
+"hospitalNetworkTable"
+);
+
+tbody.innerHTML="";
+
+hospitals.forEach(h=>{
+
+tbody.innerHTML+=`
+
+<tr>
+
+<td>${h.name}</td>
+
+<td>${h.icu?"AVAILABLE":"NO"}</td>
+
+<td>${h.oxygen?"AVAILABLE":"NO"}</td>
+
+<td>${h.ventilator?"AVAILABLE":"NO"}</td>
+
+<td>${h.ct?"AVAILABLE":"NO"}</td>
+
+<td>${h.capacity}%</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+
+/* ================= RESOURCE STATUS ================= */
+
+function renderResourceCards(){
+
+const container=
+document.getElementById(
+"resourceCards"
+);
+
+container.innerHTML="";
+
+hospitals.forEach(h=>{
+
+container.innerHTML+=`
+
+<div style="
+background:#09100c;
+border:1px solid #252e29;
+padding:17px;
+border-radius:11px;
+margin-bottom:12px;
+">
+
+<div style="
+font-weight:bold;
+margin-bottom:10px;
+">
+
+${h.name}
+
+</div>
+
+<div style="
+font-size:12px;
+color:#78847d;
+margin-bottom:7px;
+">
+
+Resource Capacity: ${h.capacity}%
+
+</div>
+
+<div class="progress">
+
+<div
+class="progressFill"
+style="width:${h.capacity}%">
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+/* ================= CALL ================= */
+
+function callHospital(){
+
+if(!selectedHospital)
+return;
+
+const name=
+selectedHospital.name;
+
+
+document
+.getElementById("callStatus")
+.innerText=
+"CALLING...";
+
+document
+.getElementById("connectionStatus")
+.innerText=
+"Connecting...";
+
+document
+.getElementById("amigoCallStatus")
+.innerText=
+"Calling Hospital";
+
+
+document
+.getElementById("modalText")
+.innerHTML=`
+
+AMIGO is establishing an emergency communication channel with
+
+<strong>
+${name}
+</strong>
+
+<br><br>
+
+Patient details and required emergency resources are being prepared for hospital coordination.
+
+<br><br>
+
+<strong style="color:#79b990;">
+CALL CONNECTION ESTABLISHED
+</strong>
+
+`;
+
+
+document
+.getElementById("callModal")
+.style.display="flex";
+
+
+setTimeout(()=>{
+
+document
+.getElementById("callStatus")
+.innerText=
+"CONNECTED";
+
+document
+.getElementById("connectionStatus")
+.innerText=
+"Connected";
+
+document
+.getElementById("amigoCallStatus")
+.innerText=
+"Hospital Connected";
+
+},1200);
+
+}
+
+
+/* ================= BACKUP CALL ================= */
+
+function callBackupHospital(){
+
+if(!backupHospital)
+return;
+
+const name=
+backupHospital.name;
+
+
+document
+.getElementById("modalText")
+.innerHTML=`
+
+AMIGO is contacting the backup hospital:
+
+<br><br>
+
+<strong style="color:#79b990;">
+${name}
+</strong>
+
+<br><br>
+
+Backup coordination channel is ready.
+
+<br><br>
+
+<strong style="color:#79b990;">
+BACKUP CONNECTION READY
+</strong>
+
+`;
+
+
+document
+.getElementById("callModal")
+.style.display="flex";
+
+}
+
+
+/* ================= CLOSE ================= */
+
+function closeModal(){
+
+document
+.getElementById("callModal")
+.style.display="none";
+
+}
+
+
+/* ================= CLOCK ================= */
+
+function updateClock(){
+
+const now=new Date();
+
+document
+.getElementById("clock")
+.innerText=
+now.toLocaleString(
+"en-IN",
+{
+dateStyle:"medium",
+timeStyle:"medium"
+}
+);
+
+}
+
+setInterval(
+updateClock,
+1000
+);
+
+updateClock();
+
+
+/* ================= INITIAL ================= */
+
+renderHospitalTable(
+selectedHospital,
+backupHospital
+);
+
+renderResourceCards();
+
+</script>
+
+</body>
+</html>
